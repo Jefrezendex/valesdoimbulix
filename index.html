@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="fav.ico.png" type="image/x-icon">
+  <title>Gerador de Vales</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 10px;
+    }
+
+    .config {
+      background-color: white;
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-bottom: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    label {
+      font-weight: bold;
+    }
+
+    input {
+      padding: 6px 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    /* Layout dos vales */
+    .page {
+      width: 297mm;
+      height: 210mm;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 10px;
+      background: white;
+      padding: 10px;
+      box-sizing: border-box;
+      border-radius: 10px;
+    }
+
+    .card {
+      border: 2px solid #ff6600;
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background-color: #fafafa;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .header img {
+      width: 100%;
+      height: auto;
+      border-radius: 6px;
+    }
+
+    .content {
+      font-size: 14px;
+      color: #333;
+    }
+
+    .bold {
+      font-weight: bold;
+    }
+
+    .red {
+      color: #d93025;
+      font-weight: bold;
+    }
+
+    .ass {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 10px;
+    }
+
+    .footer {
+      margin-top: 8px;
+      font-size: 10px;
+      color: #555;
+      border-top: 1px dashed #ccc;
+      padding-top: 5px;
+      text-align: center;
+    }
+
+    /* Apenas para visualização no celular (não afeta PDF) */
+    @media (max-width: 768px) {
+      .page {
+        transform: scale(0.5);
+        transform-origin: top left;
+        width: 100%;
+        height: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="config">
+    <label>Endereço da obra:</label>
+    <input type="text" id="endereco" placeholder="Insira o endereço">
+    
+    <label>Tipo de material:</label>
+    <input type="text" id="material" placeholder="Insira o material">
+    
+    <button onclick="gerarVales()">Gerar Vales</button>
+    <button onclick="imprimirVales()">Imprimir Vales</button>
+  </div>
+
+  <div id="vales" class="page"></div>
+
+<script>
+function gerarVales() {
+  const endereco = document.getElementById('endereco').value.trim();
+  const material = document.getElementById('material').value.trim();
+
+  if (endereco === '') {
+    alert('⚠️ Por favor, preencha o endereço da obra antes de gerar os vales.');
+    return;
+  }
+
+  const valesDiv = document.getElementById('vales');
+  valesDiv.innerHTML = '';
+
+  for (let i = 0; i < 4; i++) {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="header">
+        <img src="logolandapp.png" alt="Logo">
+      </div>
+      <div class="content">
+        <p><span class="bold">${endereco}</span></p>
+        <p>
+          <span class="bold">DATA:</span> ___/___/_____ &nbsp;&nbsp;
+          <span class="bold">PLACA:</span> ___________
+          <span class="bold">CTR Nº:</span> _______________
+        </p>
+        <p><span class="bold">MATERIAL:</span> - <span class="red">${material}</span></p>
+        <div class="ass">
+          <span class="bold">ASS:</span> 
+        </div>
+        <div class="footer">
+          LandApp Technology
+        </div>
+      </div>
+    `;
+    valesDiv.appendChild(card);
+  }
+}
+
+function imprimirVales() {
+  const element = document.getElementById('vales');
+  if (!element.innerHTML.trim()) {
+    alert('⚠️ Por favor, clique em "Gerar Vales" antes de imprimir.');
+    return;
+  }
+
+  const opt = {
+    margin: [2, 2, 2, 2],  // bordas mínimas
+    filename: 'vales.pdf',
+    image: { type: 'jpeg', quality: 1 },
+    html2canvas: { scale: 5, useCORS: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+  };
+
+  html2pdf().set(opt).from(element).save();
+}
+</script>
+
+</body>
+</html>
